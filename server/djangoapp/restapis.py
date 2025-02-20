@@ -13,22 +13,36 @@ sentiment_analyzer_url = os.getenv(
 
 # def get_request(endpoint, **kwargs):
 # Add code for get requests to back end
+import requests
+import os
+from urllib.parse import urlencode
+
 def get_request(endpoint, **kwargs):
-    params = ""
-    if(kwargs):
-        for key,value in kwargs.items():
-            params=params+key+"="+value+"&"
+    # Build query parameters if any are passed
+    params = urlencode(kwargs)  # Automatically handles URL encoding
+    
+    # Construct the full request URL
+    request_url = os.getenv('backend_url') + endpoint
+    if params:
+        request_url += "?" + params  # Only append `?` if params exist
 
-    request_url = backend_url+endpoint+"?"+params
-
-    print("GET from {} ".format(request_url))
+    print(f"GET from {request_url}")  # Print URL for debugging
+    
     try:
-        # Call get method of requests library with URL and parameters
+        # Send GET request
         response = requests.get(request_url)
-        return response.json()
-    except:
-        # If any error occurs
-        print("Network exception occurred")
+        
+        # Handle the response based on status code
+        if response.status_code == 200:
+            return response.json()  # Return the JSON response
+        else:
+            print(f"Failed with status code {response.status_code}")
+            return {"error": "Failed to fetch data"}
+    except requests.exceptions.RequestException as e:
+        # Catch and log network errors
+        print(f"Network exception occurred: {e}")
+        return {"error": "Network exception occurred"}
+
 
 # def analyze_review_sentiments(text):
 # request_url = sentiment_analyzer_url+"analyze/"+text

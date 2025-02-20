@@ -149,3 +149,18 @@ def add_review(request):
             return JsonResponse({"status":401,"message":"Error in posting review"})
     else:
         return JsonResponse({"status":403,"message":"Unauthorized"})
+
+def get_dealers(request):
+    backend_url = os.getenv('backend_url') + '/fetchDealers'  # Use the backend URL from .env
+    try:
+        response = requests.get(backend_url)
+        
+        # Check if the backend response is successful
+        if response.status_code == 200:
+            return JsonResponse(response.json(), safe=False)  # Return the backend data as a response
+        else:
+            return JsonResponse({"error": "Failed to fetch dealers"}, status=response.status_code)
+    except requests.exceptions.RequestException as e:
+        # Catch and print any exception during the request
+        print(f"Error: {e}")
+        return JsonResponse({"error": "Failed to fetch dealers due to a network issue"}, status=500)
