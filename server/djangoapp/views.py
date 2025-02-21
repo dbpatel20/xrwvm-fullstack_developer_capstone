@@ -24,7 +24,8 @@ def login_user(request):
 
             if not username or not password:
                 return JsonResponse(
-                    {"status": "error", "message": "Username and password are required"},
+                    {"status": "error", 
+                     "message": "Username and password are required"},
                     status=400
                 )
 
@@ -32,15 +33,18 @@ def login_user(request):
 
             if user is not None:
                 login(request, user)
-                return JsonResponse({"userName": username, "status": "Authenticated"})
+                return JsonResponse({"userName": username, 
+                                     "status": "Authenticated"})
             else:
                 return JsonResponse(
-                    {"status": "error", "message": "Invalid username or password"},
+                    {"status": "error", 
+                     "message": "Invalid username or password"},
                     status=400
                 )
         except KeyError:
             return JsonResponse(
-                {"status": "error", "message": "Request body must contain 'userName' and 'password'"},
+                {"status": "error", 
+                 "message": "Request body must contain 'userName' and 'password'"},
                 status=400
             )
         except json.JSONDecodeError:
@@ -71,7 +75,6 @@ def registration(request):
     first_name = data['firstName']
     last_name = data['lastName']
     email = data['email']
-    
     username_exist = False
     try:
         User.objects.get(username=username)
@@ -85,9 +88,11 @@ def registration(request):
             last_name=last_name, password=password, email=email
         )
         login(request, user)
-        return JsonResponse({"userName": username, "status": "Authenticated"})
+        return JsonResponse({"userName": username, 
+                             "status": "Authenticated"})
     else:
-        return JsonResponse({"userName": username, "error": "Already Registered"})
+        return JsonResponse({"userName": username, 
+                             "error": "Already Registered"})
 
 
 def get_cars(request):
@@ -96,7 +101,8 @@ def get_cars(request):
         initiate()
     car_models = CarModel.objects.select_related('car_make')
     cars = [
-        {"CarModel": car_model.name, "CarMake": car_model.car_make.name}
+        {"CarModel": car_model.name, 
+         "CarMake": car_model.car_make.name}
         for car_model in car_models
     ]
     return JsonResponse({"CarModels": cars})
@@ -109,7 +115,8 @@ def get_dealerships(request, state="All"):
     else:
         endpoint = f"/fetchDealers/{state}"
     dealerships = get_request(endpoint)
-    return JsonResponse({"status": 200, "dealers": dealerships})
+    return JsonResponse({"status": 200, 
+                         "dealers": dealerships})
 
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
@@ -120,9 +127,11 @@ def get_dealer_reviews(request, dealer_id):
         for review_detail in reviews:
             response = analyze_review_sentiments(review_detail['review'])
             review_detail['sentiment'] = response['sentiment']
-        return JsonResponse({"status": 200, "reviews": reviews})
+        return JsonResponse({"status": 200, 
+                             "reviews": reviews})
     else:
-        return JsonResponse({"status": 400, "message": "Bad Request"})
+        return JsonResponse({"status": 400, 
+                             "message": "Bad Request"})
 
 
 # Create a `get_dealer_details` view to render the dealer details
@@ -130,9 +139,11 @@ def get_dealer_details(request, dealer_id):
     if dealer_id:
         endpoint = f"/fetchDealer/{dealer_id}"
         dealership = get_request(endpoint)
-        return JsonResponse({"status": 200, "dealer": dealership})
+        return JsonResponse({"status": 200, 
+                             "dealer": dealership})
     else:
-        return JsonResponse({"status": 400, "message": "Bad Request"})
+        return JsonResponse({"status": 400, 
+                             "message": "Bad Request"})
 
 
 # Create a `add_review` view to submit a review
@@ -143,9 +154,11 @@ def add_review(request):
             response = post_review(data)
             return JsonResponse({"status": 200})
         except Exception as e:
-            return JsonResponse({"status": 401, "message": f"Error in posting review: {e}"})
+            return JsonResponse({"status": 401, 
+                                 "message": f"Error in posting review: {e}"})
     else:
-        return JsonResponse({"status": 403, "message": "Unauthorized"})
+        return JsonResponse({"status": 403, 
+                             "message": "Unauthorized"})
 
 
 def get_dealers(request):
@@ -155,7 +168,9 @@ def get_dealers(request):
         if response.status_code == 200:
             return JsonResponse(response.json(), safe=False)
         else:
-            return JsonResponse({"error": "Failed to fetch dealers"}, status=response.status_code)
+            return JsonResponse({"error": "Failed to fetch dealers"}, 
+                                status=response.status_code)
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
-        return JsonResponse({"error": "Failed to fetch dealers due to a network issue"}, status=500)
+        return JsonResponse({"error": "Failed to fetch dealers due to a network issue"}, 
+                            status=500)

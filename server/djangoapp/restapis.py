@@ -14,18 +14,14 @@ sentiment_analyzer_url = os.getenv(
 def get_request(endpoint, **kwargs):
     # Build query parameters if any are passed
     params = urlencode(kwargs)  # Automatically handles URL encoding
-    
     # Construct the full request URL
     request_url = os.getenv('backend_url') + endpoint
     if params:
         request_url += "?" + params  # Only append `?` if params exist
-
     print(f"GET from {request_url}")  # Print URL for debugging
-    
     try:
         # Send GET request
         response = requests.get(request_url)
-        
         # Handle the response based on status code
         if response.status_code == 200:
             return response.json()  # Return the JSON response
